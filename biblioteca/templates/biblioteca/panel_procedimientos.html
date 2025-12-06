@@ -1,0 +1,48 @@
+<!-- En templates/biblioteca/panel_procedimientos.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-cogs"></i> Procedimientos de Biblioteca</h1>
+    <p class="lead">Ejecuta reportes y análisis de datos de la biblioteca</p>
+    
+    <div class="row mt-5">
+        {% for proc in procedimientos %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow border-{{ proc.color }}">
+                <div class="card-header bg-{{ proc.color }} text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="{{ proc.icono }}"></i> {{ proc.nombre }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ proc.descripcion }}</p>
+                </div>
+                <div class="card-footer">
+                    <form method="post" action="{% url 'ejecutar_procedimiento' proc.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-{{ proc.color }}">
+                            <i class="fas fa-play-circle"></i> Ejecutar Procedimiento
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.3s;
+    height: 100%;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.card-header {
+    border-bottom: none;
+}
+</style>
+{% endblock %}

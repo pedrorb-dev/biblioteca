@@ -1,0 +1,11 @@
+<form enctype="multipart/form-data" method="POST">
+  {% csrf_token %}
+  {% for campo in formulario %}
+    <div class="mb-3">
+      <label class="form-label">{{ campo.label }}</label>
+      {{ campo }}
+      <div class="form-text text-danger">{{ campo.errors }}</div>
+    </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Enviar</button>
+</form>

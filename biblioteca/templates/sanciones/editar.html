@@ -1,0 +1,15 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Editar sancion {% endblock %}
+
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Editar una sancion </h1>
+            {% include 'sanciones/form.html' %}
+        </div>
+        <div class="card-footer text-muted"></div>
+    </div>
+    
+{% endblock %} 

@@ -1,0 +1,185 @@
+<!-- En templates/biblioteca/resultado_procedimiento.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <a href="{% url 'panel_procedimientos' %}" class="btn btn-secondary mb-3">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+    </a>
+    
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                {% if procedimiento_id == 'reporte_carreras' %}
+                    <i class="fas fa-chart-bar"></i> Reporte de Préstamos por Carrera
+                {% elif procedimiento_id == 'libpos_populares' %}
+                    <i class="fas fa-book"></i> Libros Más Populares
+                {% endif %}
+            </h4>
+        </div>
+        
+        <div class="card-body">
+            {% if resultado and resultado.success %}
+                {% if procedimiento_id == 'reporte_carreras' %}
+                    <!-- Formulario para fechas -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="post" class="border p-3 rounded bg-light">
+                                {% csrf_token %}
+                                <h5>Seleccionar Rango de Fechas</h5>
+                                <div class="mb-3">
+                                    <label for="fecha_inicio" class="form-label">Fecha Inicio:</label>
+                                    <input type="date" class="form-control" id="fecha_inicio" 
+                                           name="fecha_inicio" value="{{ fecha_actual|date:'Y-m-d' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="fecha_fin" class="form-label">Fecha Fin:</label>
+                                    <input type="date" class="form-control" id="fecha_fin" 
+                                           name="fecha_fin" value="{{ fecha_actual|date:'Y-m-d' }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Filtrar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabla de resultados -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Carrera</th>
+                                    <th>Alumnos Activos</th>
+                                    <th>Total Préstamos</th>
+                                    <th>Libros Diferentes</th>
+                                    <th>Duración Promedio (días)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for conjunto in resultado.resultados %}
+                                    {% for fila in conjunto %}
+                                    <tr>
+                                        <td><strong>{{ fila.carrera_nombre }}</strong></td>
+                                        <td class="text-center">{{ fila.alumnos_activos }}</td>
+                                        <td class="text-center">{{ fila.total_prestamos }}</td>
+                                        <td class="text-center">{{ fila.libros_diferentes }}</td>
+                                        <td class="text-center">{{ fila.duracion_promedio|floatformat:1 }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No hay datos para el período seleccionado</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                {% elif procedimiento_id == 'libros_populares' %}
+                    <!-- Formulario para límite -->
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="limite" class="form-label">Mostrar:</label>
+                                <select class="form-select" id="limite" name="limite">
+                                    <option value="5">5 libros</option>
+                                    <option value="10" selected>10 libros</option>
+                                    <option value="20">20 libros</option>
+                                    <option value="50">50 libros</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i> Actualizar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Tarjetas de libros -->
+                    <div class="row">
+                        {% for conjunto in resultado.resultados %}
+                            {% for libro in conjunto %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">#{{ forloop.counter }}</h6>
+                                        <span class="badge bg-info">{{ libro.total_prestamos }} préstamos</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ libro.titulo }}</h5>
+                                        <p class="card-text">
+                                            <i class="fas fa-user-edit"></i> <strong>Autor:</strong> {{ libro.autor }}<br>
+                                            <i class="fas fa-tag"></i> <strong>Categoría:</strong> {{ libro.categoria }}<br>
+                                            <i class="fas fa-circle {% if libro.status == 'DISPONIBLE' %}text-success{% else %}text-warning{% endif %}"></i>
+                                            <strong>Estado:</strong> {{ libro.status }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    No hay datos de libros disponibles
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    
+                {% endif %}
+                
+                <!-- Botón para exportar -->
+                <div class="mt-4">
+                    <button class="btn btn-success" onclick="exportarTabla()">
+                        <i class="fas fa-file-export"></i> Exportar a Excel
+                    </button>
+                </div>
+                
+            {% elif resultado and not resultado.success %}
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Error</h5>
+                    <p>{{ resultado.error }}</p>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle"></i> Información</h5>
+                    <p>Ejecuta el procedimiento para ver los resultados.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer text-muted">
+            <small>Procedimiento ejecutado el {% now "d/m/Y H:i" %}</small>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportarTabla() {
+    // Función simple para exportar tabla a Excel
+    alert('Función de exportación. Implementa según tu necesidad.');
+}
+
+// Establecer fechas por defecto
+document.addEventListener('DOMContentLoaded', function() {
+    const hoy = new Date().toISOString().split('T')[0];
+    const hace30Dias = new Date();
+    hace30Dias.setDate(hace30Dias.getDate() - 30);
+    const fechaHace30 = hace30Dias.toISOString().split('T')[0];
+    
+    const fechaInicio = document.getElementById('fecha_inicio');
+    const fechaFin = document.getElementById('fecha_fin');
+    
+    if (fechaInicio && !fechaInicio.value) {
+        fechaInicio.value = fechaHace30;
+    }
+    if (fechaFin && !fechaFin.value) {
+        fechaFin.value = hoy;
+    }
+});
+</script>
+{% endblock %}

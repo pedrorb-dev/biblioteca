@@ -1,0 +1,53 @@
+{# templates/admin/index.html #}
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+  <h2>Herramientas del Sistema</h2>
+
+  <!-- BOTONES PRINCIPALES -->
+  <div style="margin-bottom: 30px;">
+    <a href="{% url 'custom_admin:procedimientos' %}" class="button"
+      style="display:inline-block;padding:10px 16px;background:#6c5ce7;color:#fff;border-radius:4px;text-decoration:none;margin-right:10px;margin-bottom:10px;">
+      📊 Procedimientos Visuales
+    </a>
+    <a href="{% url 'custom_admin:backup-db' %}" class="button"
+      style="display:inline-block;padding:10px 16px;background:#2980b9;color:#fff;border-radius:4px;text-decoration:none;margin-right:10px;margin-bottom:10px;">
+      💾 Descargar respaldo (ZIP)
+    </a>
+  </div>
+
+  <hr>
+
+  <h3>Restaurar respaldo (MySQL .sql)</h3>
+  <p>{{ mysql_restore_help }}</p>
+
+  <form method="post" action="{% url 'custom_admin:restore-db' %}" enctype="multipart/form-data" style="margin-top:10px;">
+    {% csrf_token %}
+    <input type="file" name="backup_file" accept=".sql,.zip" required>
+    <button type="submit" style="margin-left:8px;padding:8px 12px;background:#28a745;color:#fff;border:none;border-radius:4px;">
+      🔄 Restaurar respaldo
+    </button>
+  </form>
+
+  {% if messages %}
+    <ul style="margin-top:12px;">
+      {% for m in messages %}
+        <li{% if m.tags %} class="{{ m.tags }}"{% endif %}>{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <img src="{% static 'logo.png' %}" alt="Logo itcg" style="margin-top:-200px;max-width:200px;float: right;">
+
+  {{ block.super }}
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <style>
+    .button:hover {
+      background-color: #555;
+    }
+  </style>
+{% endblock %}

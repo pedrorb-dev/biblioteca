@@ -1,0 +1,241 @@
+<!-- templates/admin/biblioteca/prestamo_change_form.html -->
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+/* Estilos para la ventana modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.status-available { background: #d4edda; color: #155724; }
+.status-unavailable { background: #f8d7da; color: #721c24; }
+
+#disponibilidad-check {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="transaction-panel">
+    <div class="module aligned">
+        <h2>🔄 Panel de Transacción de Préstamo</h2>
+        <div class="form-row">
+            <div class="alert alert-info">
+                <strong>Esta operación es una transacción atómica:</strong>
+                <ul>
+                    <li>1️⃣ Validar disponibilidad del libro</li>
+                    <li>2️⃣ Registrar préstamo en sistema</li>
+                    <li>3️⃣ Actualizar estado del libro</li>
+                    <li>4️⃣ Confirmar cambios (COMMIT) o revertir (ROLLBACK)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Panel de validación en tiempo real -->
+        <div class="form-row">
+            <div class="field-box">
+                <h3>🔍 Validación de Disponibilidad</h3>
+                <button type="button" id="check-availability" class="button" 
+                        onclick="checkBookAvailability()">
+                    Verificar Disponibilidad del Libro
+                </button>
+                <div id="disponibilidad-result"></div>
+            </div>
+        </div>
+        
+        <!-- Indicador de transacción -->
+        <div class="form-row">
+            <div class="field-box">
+                <h3>📊 Estado de Transacción</h3>
+                <div id="transaction-status">
+                    {% if original %}
+                        <div class="status-badge status-available">
+                            ✅ Transacción completada el {{ original.fecha_prestamo|date:"d/m/Y H:i" }}
+                        </div>
+                    {% else %}
+                        <div class="status-badge" style="background:#fff3cd;color:#856404;">
+                            ⏳ Transacción pendiente de confirmación
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana modal para errores -->
+<div id="errorModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color: #dc3545;">❌ Error en Transacción</h3>
+        <div id="modalMessage"></div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="closeModal()" class="button" style="background: #6c757d; color: white;">
+                Cerrar y Corregir
+            </button>
+        </div>
+    </div>
+</div>
+
+{{ block.super }}
+
+<script>
+// Función para verificar disponibilidad del libro
+function checkBookAvailability() {
+    const libroField = document.getElementById('id_libro');
+    if (!libroField || !libroField.value) {
+        showMessage('⚠️ Primero seleccione un libro', 'warning');
+        return;
+    }
+    
+    const libroId = libroField.value;
+    const resultDiv = document.getElementById('disponibilidad-result');
+    resultDiv.innerHTML = '<div style="color: #17a2b8;">⏳ Verificando disponibilidad...</div>';
+    
+    $.ajax({
+        url: `/admin/check-libro/${libroId}/`,
+        type: 'GET',
+        success: function(data) {
+            if (data.disponible) {
+                resultDiv.innerHTML = `
+                    <div class="status-badge status-available">
+                        ✅ LIBRO DISPONIBLE<br>
+                        <strong>${data.libro}</strong><br>
+                        Autor: ${data.autor}<br>
+                        <em>Puede proceder con el préstamo</em>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="status-badge status-unavailable">
+                        ❌ LIBRO NO DISPONIBLE<br>
+                        <strong>${data.libro}</strong><br>
+                        Actualmente prestado a: <strong>${data.prestado_a}</strong><br>
+                        Desde: ${data.desde}<br>
+                        <em>Debe registrar la devolución primero</em>
+                    </div>
+                `;
+                // Mostrar ventana modal
+                showModal(`El libro "<strong>${data.libro}</strong>" ya se encuentra prestado a <strong>${data.prestado_a}</strong> desde el ${data.desde}.`);
+            }
+        },
+        error: function() {
+            resultDiv.innerHTML = '<div style="color: #dc3545;">Error al verificar disponibilidad</div>';
+        }
+    });
+}
+
+// Función para mostrar ventana modal
+function showModal(message) {
+    document.getElementById('modalMessage').innerHTML = message;
+    document.getElementById('errorModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('errorModal').style.display = 'none';
+}
+
+function showMessage(text, type = 'info') {
+    const colors = {
+        'info': '#17a2b8',
+        'success': '#28a745',
+        'warning': '#ffc107',
+        'error': '#dc3545'
+    };
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px;
+        background: ${colors[type]};
+        color: white;
+        border-radius: 5px;
+        z-index: 10000;
+        animation: slideInRight 0.3s ease;
+    `;
+    messageDiv.innerHTML = text;
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => document.body.removeChild(messageDiv), 300);
+    }, 5000);
+}
+
+// Validar antes de enviar el formulario
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('prestamo_form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const libroField = document.getElementById('id_libro');
+            if (libroField && libroField.value) {
+                // Podríamos hacer una última validación aquí
+                console.log('Validación final antes de enviar...');
+            }
+        });
+    }
+    
+    // Auto-verificar cuando se selecciona un libro
+    const libroField = document.getElementById('id_libro');
+    if (libroField) {
+        libroField.addEventListener('change', function() {
+            setTimeout(checkBookAvailability, 500);
+        });
+    }
+});
+
+// Estilos CSS dinámicos
+const style = document.createElement('style');
+style.textContent = `
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

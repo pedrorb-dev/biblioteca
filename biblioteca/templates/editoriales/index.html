@@ -1,0 +1,69 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Lista de Editoriales {% endblock %}
+
+{% block contenido %} 
+
+<div class="card">
+    <div class="card-header">
+        <a
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'crear_editorial' %}"
+            role="button"
+            >Agregar Editorial</a
+        >
+        
+    </div>
+    <div class="card-body">
+        
+        <div
+            class="table-responsive"
+        >
+            <table
+                class="table"
+                border="5"
+            >
+                <thead>
+                    <tr>
+                        <th>ID_EDITORIAL</th>
+                        <th>NOMBRE</th>
+                        <th>PAIS DE ORIGEN</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for editorial in editoriales %}
+                    <tr class="">
+                        <td>{{ editorial.id_editorial }}</td>
+                        <td>{{ editorial.nombre }}</td>
+                        <td>{{ editorial.pais}}</td>
+                        <td>
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'editar_editorial' editorial.id_editorial %}"
+                                role="button"
+                                >Editar</a
+                            >
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-danger"
+                                href="{% url 'eliminar_editorial' editorial.id_editorial %}"
+                                role="button"
+                                >Eliminar</a
+                            >
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div class="card-footer text-muted"></div>
+</div>
+
+{% endblock %} 

@@ -1,0 +1,62 @@
+from django.urls import path
+from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('',views.home, name='home'),
+    path('libros', views.libros, name='libros'),
+    path('libros/crear', views.crear_libro, name='crear_libro'),
+    path('libros/editar', views.editar_libro, name='editar_libro'),
+    path('eliminar_libro/<str:id>', views.eliminar_libro, name='eliminar_libro'),
+    path('libros/editar/<str:id>', views.editar_libro, name='editar_libro'),
+    path('alumnos', views.alumnos, name='alumnos'),
+    path('alumnos/crear', views.crear_alumno, name='crear_alumno'),
+    path('alumnos/editar', views.editar_alumno, name='editar_alumno'),
+    path('eliminar_alumno/<str:id>', views.eliminar_alumno, name='eliminar_alumno'),
+    path('alumnos/editar/<str:id>', views.editar_alumno, name='editar_alumno'), 
+    path('autores', views.autores, name='autores'),
+    path('autores/crear', views.crear_autor, name='crear_autor'),
+    path('autores/editar', views.editar_autor, name='editar_autor'),
+    path('eliminar_autor/<str:id>', views.eliminar_autor, name='eliminar_autor'),
+    path('autores/editar/<str:id>', views.editar_autor, name='editar_autor'),
+    path('carreras', views.carreras, name='carreras'),
+    path('carreras/crear', views.crear_carrera, name='crear_carrera'),
+    path('carreras/editar', views.editar_carrera, name='editar_carrera'),
+    path('eliminar_carrera/<str:id>', views.eliminar_carrera, name='eliminar_carrera'),
+    path('carreras/editar/<str:id>', views.editar_carrera, name='editar_carrera'),  
+    path('categorias', views.categorias, name='categorias'),
+    path('categorias/crear', views.crear_categoria, name='crear_categoria'),
+    path('categorias/editar', views.editar_categoria, name='editar_categoria'),
+    path('eliminar_categoria/<str:id>', views.eliminar_categoria, name='eliminar_categoria'),
+    path('categorias/editar/<str:id>', views.editar_categoria, name='editar_categoria'),    
+    path('editoriales', views.editoriales, name='editoriales'),
+    path('editoriales/crear', views.crear_editorial, name='crear_editorial'),
+    path('editoriales/editar', views.editar_editorial, name='editar_editorial'),
+    path('eliminar_editorial/<str:id>', views.eliminar_editorial, name='eliminar_editorial'),
+    path('editoriales/editar/<str:id>', views.editar_editorial, name='editar_editorial'),   
+    path('historiales', views.historiales, name='historiales'),
+    path('historiales/crear', views.crear_historial, name='crear_historial'),
+    path('historiales/editar', views.editar_historial, name='editar_historial'),
+    path('eliminar_historial/<str:id>', views.eliminar_historial, name='eliminar_historial'),
+    path('historiales/editar/<str:id>', views.editar_historial, name='editar_historial'),   
+    path('usuarios', views.usuarios, name='usuarios'),
+    path('usuarios/crear', views.crear_usuario, name='crear_usuario'),
+    path('usuarios/editar', views.editar_usuario, name='editar_usuario'),
+    path('eliminar_usuario/<str:id>', views.eliminar_usuario, name='eliminar_usuario'),
+    path('usuarios/editar/<str:id>', views.editar_usuario, name='editar_usuario'),   
+    path('prestamos', views.prestamos, name='prestamos'),   
+    path('prestamos/crear', views.crear_prestamo, name='crear_prestamo'),
+    path('prestamos/editar', views.editar_prestamo, name='editar_prestamo'),
+    path('eliminar_prestamo/<str:id>', views.eliminar_prestamo, name='eliminar_prestamo'),
+    path('prestamos/editar/<str:id>', views.editar_prestamo, name='editar_prestamo'),   
+    path('sanciones', views.sanciones, name='sanciones'),
+    path('sanciones/crear', views.crear_sancion, name='crear_sancion'),
+    path('sanciones/editar', views.editar_sancion, name='editar_sancion'),
+    path('eliminar_sancion/<str:id>', views.eliminar_sancion, name='eliminar_sancion'),
+    path('sanciones/editar/<str:id>', views.editar_sancion, name='editar_sancion'), 
+    
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,0 +1,14 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Agregar nuevo alumno {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Dar de alta un alumno </h1>
+            {% include 'alumnos/form.html' %}
+        </div>
+        <div class="card-footer text-muted"></div>
+    </div>
+    
+{% endblock %} 

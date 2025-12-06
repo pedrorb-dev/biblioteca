@@ -1,0 +1,72 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Lista de Sanciones {% endblock %}
+
+{% block contenido %} 
+
+<div class="card">
+    <div class="card-header">
+        <a
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'crear_sancion' %}"
+            role="button"
+            >Agregar Sancion</a
+        >
+        
+    </div>
+    <div class="card-body">
+        
+        <div
+            class="table-responsive"
+        >
+            <table
+                class="table"
+                border="5"
+            >
+                <thead>
+                    <tr>
+                        <th>ID_SANCION</th>
+                        <th>ID_ALUMNO</th>
+                        <th>MOTIVO</th>
+                        <th>FECHA DE LA SANCION</th>
+                        <th>DIAS DE SANCION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sancion in sanciones %}
+                    <tr class="">
+                        <td>{{ sancion.id_sancion }}</td>
+                        <td>{{ sancion.alumno }}</td>
+                        <td>{{ sancion.motivo }}</td>
+                        <td>{{ sancion.fecha }}</td>
+                        <td>{{ sancion.fecha_fin }}</td>
+                        <td>
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'editar_sancion' sancion.id_sancion %}"
+                                role="button"
+                                >Editar</a
+                            >
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-danger"
+                                href="{% url 'eliminar_sancion' sancion.id_sancion %}"
+                                role="button"
+                                >Eliminar</a
+                            >
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div class="card-footer text-muted"></div>
+</div>
+
+{% endblock %} 

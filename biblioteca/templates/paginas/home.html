@@ -1,0 +1,137 @@
+{% extends "paginas/estructura.html" %}
+{% load static %}
+
+{% block titulo %}Inicio - Biblioteca{% endblock %}
+
+{% block contenido %}
+<style>
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: black; 
+  border-radius: 50%;
+  filter: invert(1); 
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+}
+.carousel-control-prev,
+.carousel-control-next {
+  opacity: 1;
+}
+</style>
+
+
+<div id="carouselBiblioteca" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+
+    <div class="carousel-item active">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Alumnos</h4>
+          <p>Registra y consulta alumnos activos de la biblioteca.</p>
+          <a href="{% url 'alumnos' %}" class="btn btn-primary">Ver alumnos</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Autores</h4>
+          <p>Administra los autores de los libros registrados.</p>
+          <a href="{% url 'autores' %}" class="btn btn-primary">Ver autores</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Carreras</h4>
+          <p>Consulta las carreras académicas disponibles.</p>
+          <a href="{% url 'carreras' %}" class="btn btn-primary">Ver carreras</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Categorías</h4>
+          <p>Organiza los libros por categorías o géneros.</p>
+          <a href="{% url 'categorias' %}" class="btn btn-primary">Ver categorías</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Editoriales</h4>
+          <p>Consulta las editoriales y su país de origen.</p>
+          <a href="{% url 'editoriales' %}" class="btn btn-primary">Ver editoriales</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Libros</h4>
+          <p>Administra los libros disponibles en la biblioteca.</p>
+          <a href="{% url 'libros' %}" class="btn btn-primary">Ver libros</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Historiales</h4>
+          <p>Consulta los historiales de préstamos y devoluciones.</p>
+          <a href="{% url 'historiales' %}" class="btn btn-primary">Ver historiales</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Usuarios</h4>
+          <p>Gestiona los usuarios del sistema de biblioteca.</p>
+          <a href="{% url 'usuarios' %}" class="btn btn-primary">Ver usuarios</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Préstamos</h4>
+          <p>Administra los préstamos activos de libros.</p>
+          <a href="{% url 'prestamos' %}" class="btn btn-primary">Ver préstamos</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+          <h4>Sanciones</h4>
+          <p>Registra sanciones a los alumnos por retrasos o daños.</p>
+          <a href="{% url 'sanciones' %}" class="btn btn-primary">Ver sanciones</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselBiblioteca" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselBiblioteca" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
+
+{% endblock %}

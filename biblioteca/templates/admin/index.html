@@ -1,0 +1,20 @@
+{# templates/admin/index.html #}
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+
+  <h2>Herramientas del Sistema</h2>
+
+  {# Usar perms: evita errores de sintaxis y es la forma habitual en templates #}
+  {% if request.user.is_superuser or perms.biblioteca.change_libro %}
+    <a href="{% url 'custom_admin:backup-db' %}"
+       style="display:inline-block;margin-bottom:20px;padding:10px 15px;background:#2980b9;color:white;border-radius:5px;text-decoration:none;">
+      Exportar respaldo de la base de datos
+    </a>
+  {% else %}
+    <p>Si eres administrador verás aquí la herramienta de respaldo.</p>
+  {% endif %}
+
+  {{ block.super }}
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Agregar nueva categoria {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Dar de alta una categoria </h1>
+            {% include 'categorias/form.html' %}
+        </div>
+        <div class="card-footer text-muted"></div>
+    </div>
+    
+{% endblock %} 

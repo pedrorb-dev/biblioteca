@@ -1,0 +1,15 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Editar alumno {% endblock %}
+
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Editar un alumno </h1>
+            {% include 'alumnos/form.html' %}
+        </div>
+        <div class="card-footer text-muted"></div>
+    </div>
+    
+{% endblock %} 

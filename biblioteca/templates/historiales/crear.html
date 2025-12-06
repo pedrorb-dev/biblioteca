@@ -1,0 +1,14 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Agregar nuevo historial {% endblock %}
+
+{% block contenido %} 
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Dar de alta una historial </h1>
+            {% include 'historiales/form.html' %}
+        </div>
+        <div class="card-footer text-muted"></div>
+    </div>
+    
+{% endblock %} 

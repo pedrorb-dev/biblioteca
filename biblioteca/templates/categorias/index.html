@@ -1,0 +1,67 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Lista de Categorias {% endblock %}
+
+{% block contenido %} 
+
+<div class="card">
+    <div class="card-header">
+        <a
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'crear_categoria' %}"
+            role="button"
+            >Agregar Categoria</a
+        >
+        
+    </div>
+    <div class="card-body">
+        
+        <div
+            class="table-responsive"
+        >
+            <table
+                class="table"
+                border="5"
+            >
+                <thead>
+                    <tr>
+                        <th>ID_CATEGORIA</th>
+                        <th>NOMBRE</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categoria in categorias %}
+                    <tr class="">
+                        <td>{{ categoria.id_categoria }}</td>
+                        <td>{{ categoria.nombre }}</td>
+                        <td>
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'editar_categoria' categoria.id_categoria %}"
+                                role="button"
+                                >Editar</a
+                            >
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-danger"
+                                href="{% url 'eliminar_categoria' categoria.id_categoria %}"
+                                role="button"
+                                >Eliminar</a
+                            >
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div class="card-footer text-muted"></div>
+</div>
+
+{% endblock %} 

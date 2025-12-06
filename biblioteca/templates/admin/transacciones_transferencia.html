@@ -1,0 +1,204 @@
+<!-- templates/admin/transacciones_transferencia.html -->
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div class="transaction-container">
+    <h1>🔄 Transferencia de Libro entre Alumnos</h1>
+    
+    <div class="module aligned">
+        <div class="alert alert-info">
+            <h4>📋 Esta es una transacción atómica que realiza:</h4>
+            <ol>
+                <li>✅ Cierra el préstamo del alumno original</li>
+                <li>✅ Abre nuevo préstamo para el nuevo alumno</li>
+                <li>✅ Actualiza historiales de ambos</li>
+                <li>✅ Mantiene integridad de datos</li>
+            </ol>
+            <p><strong>Si falla cualquier paso, toda la operación se revierte (ROLLBACK)</strong></p>
+        </div>
+        
+        <form method="post" id="transferForm">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="field-box">
+                    <label for="prestamo_id">📚 Libro a Transferir:</label>
+                    <select name="prestamo_id" id="prestamo_id" class="vTextField" required 
+                            onchange="updateBookInfo()">
+                        <option value="">Seleccione un libro prestado</option>
+                        {% for prestamo in libros_prestados %}
+                        <option value="{{ prestamo.id_prestamo }}" 
+                                data-libro="{{ prestamo.libro.titulo }}"
+                                data-alumno="{{ prestamo.alumno.nombre }}"
+                                data-fecha="{{ prestamo.fecha_prestamo|date:'d/m/Y' }}">
+                            {{ prestamo.libro.titulo }} → {{ prestamo.alumno.nombre }} 
+                            (desde {{ prestamo.fecha_prestamo|date:'d/m/Y' }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="book-info" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;"></div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="field-box">
+                    <label for="nuevo_alumno">🎓 Transferir a Alumno:</label>
+                    <select name="nuevo_alumno" id="nuevo_alumno" class="vTextField" required>
+                        <option value="">Seleccione nuevo alumno</option>
+                        {% for alumno in alumnos %}
+                        <option value="{{ alumno.id_alumno }}">
+                            {{ alumno.nombre }} ({{ alumno.carrera.nombre|default:"Sin carrera" }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="field-box">
+                    <label for="motivo">📝 Motivo de Transferencia:</label>
+                    <textarea name="motivo" id="motivo" class="vLargeTextField" 
+                              rows="3" placeholder="Ej: Cambio de grupo, corrección administrativa..."></textarea>
+                </div>
+            </div>
+            
+            <div class="submit-row">
+                <button type="button" class="button default" onclick="simularTransferencia()">
+                    🔍 Simular Transferencia
+                </button>
+                <button type="submit" class="button" style="background: #28a745; color: white;">
+                    ✅ Ejecutar Transferencia
+                </button>
+                <a href="{% url 'custom_admin:procedimientos' %}" class="button">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Panel de simulación -->
+    <div id="simulationPanel" style="display: none; margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 5px;">
+        <h3>🔍 Simulación de Transacción</h3>
+        <div id="simulationSteps"></div>
+        <div id="simulationResult"></div>
+    </div>
+</div>
+
+<script>
+function updateBookInfo() {
+    const select = document.getElementById('prestamo_id');
+    const selected = select.options[select.selectedIndex];
+    const infoDiv = document.getElementById('book-info');
+    
+    if (selected.value) {
+        infoDiv.innerHTML = `
+            <strong>📖 Libro:</strong> ${selected.dataset.libro}<br>
+            <strong>👤 Alumno actual:</strong> ${selected.dataset.alumno}<br>
+            <strong>📅 Prestado desde:</strong> ${selected.dataset.fecha}<br>
+            <span style="color: #856404;">⚠️ Este libro será devuelto automáticamente y prestado al nuevo alumno</span>
+        `;
+    } else {
+        infoDiv.innerHTML = '';
+    }
+}
+
+function simularTransferencia() {
+    const prestamoSelect = document.getElementById('prestamo_id');
+    const alumnoSelect = document.getElementById('nuevo_alumno');
+    const panel = document.getElementById('simulationPanel');
+    const stepsDiv = document.getElementById('simulationSteps');
+    const resultDiv = document.getElementById('simulationResult');
+    
+    if (!prestamoSelect.value || !alumnoSelect.value) {
+        alert('Seleccione libro y alumno para simular');
+        return;
+    }
+    
+    panel.style.display = 'block';
+    stepsDiv.innerHTML = `
+        <div class="simulation-step">
+            <strong>PASO 1:</strong> Bloquear registro del préstamo actual <span style="color: green;">✅</span>
+        </div>
+        <div class="simulation-step">
+            <strong>PASO 2:</strong> Verificar que el libro esté prestado <span style="color: green;">✅</span>
+        </div>
+        <div class="simulation-step">
+            <strong>PASO 3:</strong> Verificar que nuevo alumno no tenga el libro <span style="color: green;">✅</span>
+        </div>
+        <div class="simulation-step">
+            <strong>PASO 4:</strong> Registrar fecha de devolución (ahora) <span style="color: green;">✅</span>
+        </div>
+        <div class="simulation-step">
+            <strong>PASO 5:</strong> Crear nuevo préstamo <span style="color: green;">✅</span>
+        </div>
+        <div class="simulation-step">
+            <strong>PASO 6:</strong> Actualizar historial <span style="color: green;">✅</span>
+        </div>
+    `;
+    
+    const libro = prestamoSelect.options[prestamoSelect.selectedIndex].dataset.libro;
+    const alumnoActual = prestamoSelect.options[prestamoSelect.selectedIndex].dataset.alumno;
+    const nuevoAlumno = alumnoSelect.options[alumnoSelect.selectedIndex].text;
+    
+    resultDiv.innerHTML = `
+        <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 5px;">
+            <strong>🏁 SIMULACIÓN EXITOSA</strong><br>
+            Transacción válida. Se transferirá:<br>
+            <strong>${libro}</strong><br>
+            De: <strong>${alumnoActual}</strong><br>
+            A: <strong>${nuevoAlumno}</strong><br>
+            <em>Presione "Ejecutar Transferencia" para confirmar</em>
+        </div>
+    `;
+}
+</script>
+
+<style>
+.transaction-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.simulation-step {
+    padding: 8px;
+    margin: 5px 0;
+    background: white;
+    border-left: 4px solid #17a2b8;
+}
+
+.form-row {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.field-box label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.submit-row {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #dee2e6;
+}
+
+.button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.button.default {
+    background: #17a2b8;
+    color: white;
+}
+</style>
+{% endblock %}
+

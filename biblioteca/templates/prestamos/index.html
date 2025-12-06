@@ -1,0 +1,74 @@
+{% extends "paginas/estructura.html" %}
+
+{% block titulo %} Lista de Prestamos {% endblock %}
+
+{% block contenido %} 
+
+<div class="card">
+    <div class="card-header">
+        <a
+            name=""
+            id=""
+            class="btn btn-primary"
+            href="{% url 'crear_prestamo' %}"
+            role="button"
+            >Agregar Prestamo</a
+        >
+        
+    </div>
+    <div class="card-body">
+        
+        <div
+            class="table-responsive"
+        >
+            <table
+                class="table"
+                border="5"
+            >
+                <thead>
+                    <tr>
+                        <th>ID_PRESTAMO</th>
+                        <th>ID_ALUMNO</th>
+                        <th>ID_LIBRO</th>
+                        <th>ID_USUARIO</th>
+                        <th>FECHA DEL PRESTAMO</th>
+                        <th>FECHA DE LA DEVOLUCIÓN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prestamo in prestamos %}
+                    <tr class="">
+                        <td>{{ prestamo.id_prestamo }}</td>
+                        <td>{{ prestamo.alumno }}</td>
+                        <td>{{ prestamo.libro }}</td>
+                        <td>{{ prestamo.usuario }}</td>
+                        <td>{{ prestamo.fecha_prestamo }}</td>
+                        <td>{{ prestamo.fecha_devolucion }}</td>
+                        <td>
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'editar_prestamo' prestamo.id_prestamo %}"
+                                role="button"
+                                >Editar</a
+                            >
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-danger"
+                                href="{% url 'eliminar_prestamo' prestamo.id_prestamo %}"
+                                role="button"
+                                >Eliminar</a
+                            >
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <div class="card-footer text-muted"></div>
+</div>
+
+{% endblock %} 
